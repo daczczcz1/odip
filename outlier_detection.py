@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from config import DATA_DIR
-from process_data import load_preprocessed_payloads_from_file, count_std_dev, count_freqs
+from process_data import load_preprocessed_payloads_from_file, count_freqs
 
 
 class Model:
@@ -29,15 +29,17 @@ class Model:
 
     def evaluate(self, payload):
         payload_freq = count_freqs(payload)
-
+        #     Todo
 
     def update(self, payloads):
         pass
+#     Todo
 
 
 def simplified_mahalanobis(x, y):
     if x.shape != y.shape:
         raise ValueError("The vectors passed should be of same shape (x.shape = " + x.shape + ", y.shape = " + y.shape)
+#     Todo
 
 
 

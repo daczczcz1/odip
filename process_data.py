@@ -1,13 +1,6 @@
 import os
 import re
 import numpy as np
-import timeit
-import datetime
-
-
-# import outlier_detection
-# import config
-
 
 def load_data_from_log_files(data_dir):
     payloads = list()
@@ -45,7 +38,6 @@ def count_freqs(payloads):
         for i in range(256):
             freqs[i] = occurences[i] / payloads_len
     mean = freqs.mean()
-    print(mean)
     devs = freqs - mean
     return freqs, occurences, devs
 
