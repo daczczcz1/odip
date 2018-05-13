@@ -2,6 +2,7 @@ import os
 import re
 import numpy as np
 
+
 def load_data_from_log_files(data_dir):
     payloads = list()
     for file in os.listdir(data_dir):
@@ -26,31 +27,40 @@ def save_to_file(filename, data_dir):
             out.write(p + "\n")
 
 
-def count_freqs(payloads):
-    occurences = np.zeros(256, dtype=np.uint64)
-    freqs = np.zeros(256, dtype=np.double)
-    payloads_len = 0
-    for idx, payload in enumerate(payloads):
-        payloads_len += len(payload)
+def count_mean_freqs(payloads):
+    probababilities_sums = np.zeros(256, dtype=np.double)
+    counter = 0
+    for payload in payloads:
+        occurrences_in_payload = np.zeros(256, dtype=np.uint64)
         for char in payload:
-            occurences[ord(char)] += 1
-    if payloads_len != 0:
-        for i in range(256):
-            freqs[i] = occurences[i] / payloads_len
-    mean = freqs.mean()
-    devs = freqs - mean
-    return freqs, occurences, devs
+            occurrences_in_payload[ord(char)] += 1
+        probababilities_sums += occurrences_in_payload / len(payload)
+        counter += 1
+    return probababilities_sums / counter
 
 
-def count_std_dev(freqs):
-    return freqs.std()
+def count_std_devs(payloads):
+    mean_freqs = count_mean_freqs(payloads)
+    devs_sums = np.zeros(256, dtype=np.double)
+    counter = 0
+    for payload in payloads:
+        occurrences_in_payload = np.zeros(256, dtype=np.uint64)
+        for char in payload:
+            occurrences_in_payload[ord(char)] += 1
+        devs_sums += occurrences_in_payload / len(payload) - mean_freqs
+        counter += 1
+    return devs_sums / counter
 
 
 if __name__ == "__main__":
-    a = load_preprocessed_payloads_from_file('output.csv')
+    a = load_preprocessed_payloads_from_file('output_small.csv')
 
-    freqs = count_freqs(a)[0]
+    freqs = count_mean_freqs(a)
     for idx, mean in enumerate(freqs):
         print(chr(idx) + " : " + str(mean))
     print(freqs.sum())
-    print()
+    print('_____________-----------------')
+    devs = count_std_devs(a)
+    for idx, mean in enumerate(devs):
+        print(chr(idx) + " : " + str(mean))
+    print(devs.sum())

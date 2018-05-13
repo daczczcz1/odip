@@ -1,7 +1,7 @@
 import numpy as np
 import os
-from config import DATA_DIR
-from process_data import load_preprocessed_payloads_from_file, count_freqs
+from config import DATA_DIR, ALPHA
+from process_data import load_preprocessed_payloads_from_file, count_mean_freqs, count_std_devs
 
 
 class Model:
@@ -13,9 +13,10 @@ class Model:
 
     def train(self, input_file):
         data = load_preprocessed_payloads_from_file(input_file)
-        stats = count_freqs(data)
-        self.freqs = stats[0]
-        self.dev = stats[2]
+        freqs = count_mean_freqs(data)
+        devs = count_std_devs(data)
+        self.freqs = freqs
+        self.dev = devs
 
     def save_to_file(self, filename, dir=''):
         with(open(dir + '/' + filename, 'w')) as f:
@@ -28,7 +29,8 @@ class Model:
             self.dev = np.fromstring(f.readline(), dtype=np.double, count=256, sep=' ')
 
     def evaluate(self, payload):
-        payload_freq = count_freqs(payload)
+        payload_freqs = count_mean_freqs(payload)
+        print(simplified_mahalanobis(self.freqs, payload_freqs, self.dev))
         #     Todo
 
     def update(self, payloads):
@@ -36,11 +38,10 @@ class Model:
 #     Todo
 
 
-def simplified_mahalanobis(x, y):
-    if x.shape != y.shape:
-        raise ValueError("The vectors passed should be of same shape (x.shape = " + x.shape + ", y.shape = " + y.shape)
-#     Todo
-
+def simplified_mahalanobis(x_freqs, y_freqs, devs):
+    if x_freqs.shape != y_freqs.shape or y_freqs.shape != devs.shape or x_freqs.shape != (256, ):
+        raise ValueError("The vectors passed should be of same shape (x.shape = " + x_freqs.shape + ", y.shape = " + y_freqs.shape + ", devs.shape = " + devs.shape)
+    return np.absolute((x_freqs - y_freqs)/(devs + ALPHA)).sum()
 
 
 if __name__ == '__main__':
@@ -58,3 +59,5 @@ if __name__ == '__main__':
 
     print(a.freqs)
     print(a.dev)
+
+    a.evaluate("index.html")
