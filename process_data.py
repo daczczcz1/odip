@@ -29,31 +29,39 @@ def save_to_file(filename, data_dir):
 
 def count_mean_freqs(payloads):
     probababilities_sums = np.zeros(256, dtype=np.double)
+    result = np.zeros(256, dtype=np.double)
     counter = 0
     for payload in payloads:
         occurrences_in_payload = np.zeros(256, dtype=np.uint64)
-        for char in payload:
-            occurrences_in_payload[ord(char)] += 1
-        probababilities_sums += occurrences_in_payload / len(payload)
+        if len(payload) > 0:
+            for char in payload:
+                occurrences_in_payload[ord(char)] += 1
+            probababilities_sums += occurrences_in_payload / len(payload)
         counter += 1
-    return probababilities_sums / counter
+    if counter > 0:
+        result = probababilities_sums / counter
+    return result
 
 
 def count_std_devs(payloads):
     mean_freqs = count_mean_freqs(payloads)
     devs_sums = np.zeros(256, dtype=np.double)
+    result = np.zeros(256, dtype=np.double)
     counter = 0
     for payload in payloads:
         occurrences_in_payload = np.zeros(256, dtype=np.uint64)
-        for char in payload:
-            occurrences_in_payload[ord(char)] += 1
-        devs_sums += occurrences_in_payload / len(payload) - mean_freqs
+        if len(payload) > 0:
+            for char in payload:
+                occurrences_in_payload[ord(char)] += 1
+            devs_sums += occurrences_in_payload / len(payload) - mean_freqs
         counter += 1
-    return devs_sums / counter
+    if counter > 0:
+        result = devs_sums / counter
+    return result
 
 
 if __name__ == "__main__":
-    a = load_preprocessed_payloads_from_file('output_small.csv')
+    a = ["aa", "ab", "bb"]
 
     freqs = count_mean_freqs(a)
     for idx, mean in enumerate(freqs):

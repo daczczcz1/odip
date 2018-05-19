@@ -30,6 +30,7 @@ class Model:
 
     def evaluate(self, payload):
         payload_freqs = count_mean_freqs(payload)
+        print(payload_freqs)
         print(simplified_mahalanobis(self.freqs, payload_freqs, self.dev))
         #     Todo
 
@@ -59,5 +60,5 @@ if __name__ == '__main__':
 
     print(a.freqs)
     print(a.dev)
-
+    print("PAYLOAD:")
     a.evaluate("index.html")
